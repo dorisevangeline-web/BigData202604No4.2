@@ -8,7 +8,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-from webdriver_manager.chrome import ChromeDriverManager
+
 
 from urllib.parse import urljoin
 
@@ -105,7 +105,7 @@ def create_driver():
         "Chrome/120.0.0.0 Safari/537.36"
     )
 
-    service = Service(ChromeDriverManager().install())
+    
     driver = webdriver.Chrome(service=service, options=chrome_options)
 
     # 隱藏 webdriver
