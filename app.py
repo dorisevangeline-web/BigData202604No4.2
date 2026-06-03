@@ -540,8 +540,8 @@ def fetch_all_events(target_store_name=None):
                 events_data.extend(normal_events)
 
     except Exception as e:
-    print("❌ Driver建立失敗")
-    print(e)
+        print("❌ Driver建立失敗")
+        print(e)
     finally:
         if driver:
             driver.quit()
