@@ -8,7 +8,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-
+from webdriver_manager.chrome import ChromeDriverManager
 
 from urllib.parse import urljoin
 
@@ -41,21 +41,17 @@ TARGET_STORES = [
 # 活動關鍵字
 # ==========================================
 TARGET_KEYWORDS = [  
-    
-    "啤酒"
     "咖啡",
     "飲料",
     "冰品",
-    #"啤酒",
+    "啤酒",
     "拿鐵",
     "美式",
     "霜淇淋",
     "第二杯",
-    #"優惠",
+    "優惠",
     "買一送一",
-    #"活動",
-
-    
+    "活動",
 
 ]
 
@@ -76,7 +72,7 @@ FILTER_KEYWORDS = [
     "line",
     "app",
     "download"
-    "cube"
+    "協會"
 ]
 
 
@@ -105,7 +101,7 @@ def create_driver():
         "Chrome/120.0.0.0 Safari/537.36"
     )
 
-    
+    service = Service(ChromeDriverManager().install())
     driver = webdriver.Chrome(service=service, options=chrome_options)
 
     # 隱藏 webdriver
@@ -237,18 +233,16 @@ def fetch_family_events(driver, base_url):
                 is_target_event = True
 
             # URL 判斷
-            elif any(key in url_text for key in ["coffee", "drink", "cafe", "campaign", "promo","-banner" ]):
+            elif any(key in url_text for key in ["coffee", "drink", "cafe", "event", "campaign", "promo", "banner"]):
                 is_target_event = True
 
             # 全家活動頁專屬
             elif (
-                "/banner/" in link
-                #or "/中獎/" in link
-                #"/Campaign/" in link
-                #or "/campaign/" in link.lower()
-                #or "/Marketing/" in link
-                #or "event" in link.lower()
-                #or "promo" in link.lower()
+                "/Campaign/" in link
+                or "/campaign/" in link.lower()
+                or "/Marketing/" in link
+                or "event" in link.lower()
+                or "promo" in link.lower()
             ):
                 is_target_event = True
 
@@ -513,7 +507,6 @@ def fetch_all_events(target_store_name=None):
     try:
         print("\n🚀 啟動超商優惠爬蟲系統")
         driver = create_driver()
-        print("✅ Driver建立成功")
 
         for store in TARGET_STORES:
             store_name = store["name"]
@@ -540,14 +533,12 @@ def fetch_all_events(target_store_name=None):
                 events_data.extend(normal_events)
 
     except Exception as e:
-        print("❌ Driver建立失敗")
-        print(e)
+        print(f"❌ 系統錯誤: {e}")
     finally:
         if driver:
             driver.quit()
 
     return events_data
-
 
 
 # ==========================================
