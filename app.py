@@ -513,6 +513,7 @@ def fetch_all_events(target_store_name=None):
     try:
         print("\n🚀 啟動超商優惠爬蟲系統")
         driver = create_driver()
+        print("✅ Driver建立成功")
 
         for store in TARGET_STORES:
             store_name = store["name"]
@@ -539,12 +540,14 @@ def fetch_all_events(target_store_name=None):
                 events_data.extend(normal_events)
 
     except Exception as e:
-        print(f"❌ 系統錯誤: {e}")
+    print("❌ Driver建立失敗")
+    print(e)
     finally:
         if driver:
             driver.quit()
 
     return events_data
+
 
 
 # ==========================================
