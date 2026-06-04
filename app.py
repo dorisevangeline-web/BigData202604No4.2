@@ -54,13 +54,20 @@ def is_valid_event(text, img_url, link):
 
 def fetch_all_events(target_store_name=None):
     events_data = []
-    driver = create_driver()
+    driver = None
 
     try:
+        driver = create_driver()
         for store in TARGET_STORES:
+
             if target_store_name and store["name"] != target_store_name:
                 continue
-            
+            try:
+                driver.get(store["url"])
+                # ... (您的爬蟲邏輯)
+            except Exception as e:
+                print(f"爬取 {store['name']} 系統崩潰: {e}")
+
             # 使用獨立 try-except 處理單一網站錯誤
             try:
                 print(f"\n🌍 正在爬取: {store['name']} ({store['url']})")
@@ -108,7 +115,14 @@ def index():
 @app.route('/api/update')
 def update_events():
     target_store = request.args.get('store')
-    return jsonify(fetch_all_events(target_store))
+    try:
+        # 嘗試抓取
+        data = fetch_all_events(target_store)
+        return jsonify(data)
+    except Exception as e:
+        # 這行會把真正的錯誤原因印出來，方便您去 Render 的 Log 查閱
+        print(f"!!! DEBUG ERROR: {str(e)}") 
+        return jsonify({"error": str(e)}), 500
 
 # 修改後：
 if __name__ == '__main__':
