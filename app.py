@@ -31,7 +31,10 @@ def create_driver():
     chrome_options.add_argument("--remote-debugging-port=9222")
     chrome_options.add_argument("window-size=1920,1080")
     chrome_options.add_argument("--disable-blink-features=AutomationControlled")
-    chrome_options.binary_location = "/usr/bin/chromium"    # 指向系統安裝的路徑
+    
+    import shutil
+    chromium_path = shutil.which("chromium") or "/usr/bin/chromium"
+    chrome_options.binary_location = chromium_path
 
     try:
         from selenium.webdriver.chrome.service import Service
@@ -122,7 +125,7 @@ def fetch_all_events(target_store_name=None):
                 driver.quit()
             except Exception as e:
                 print(f"關閉瀏覽器時發生錯誤: {e}")
-                
+
     print(f"DEBUG: 總共抓到了 {len(events_data)} 筆資料")   
     return events_data
 
