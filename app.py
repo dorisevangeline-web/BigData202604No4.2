@@ -105,7 +105,7 @@ def update_events():
     target_store = request.args.get('store')
     return jsonify(fetch_all_events(target_store))
 
+# 修改後：
 if __name__ == '__main__':
-    # Render 會自動設定 PORT 環境變數，若沒設定則預設 10000
     port = int(os.environ.get('PORT', 10000))
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='0.0.0.0', port=port, debug=False)
