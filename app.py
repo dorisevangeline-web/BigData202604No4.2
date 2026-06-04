@@ -24,6 +24,11 @@ FILTER_KEYWORDS = ["icon", "logo", "arrow", "btn", "button", "footer", "header",
 
 def create_driver():
     chrome_options = Options()
+    chrome_options.add_argument("--headless=new") # 使用新版無頭模式
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage") # 解決 Linux 記憶體不足
+    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--remote-debugging-port=9222") # 避開常見錯誤
 
     from selenium.webdriver.chrome.service import Service
     from webdriver_manager.chrome import ChromeDriverManager
