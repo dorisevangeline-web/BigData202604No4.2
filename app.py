@@ -24,29 +24,31 @@ FILTER_KEYWORDS = ["icon", "logo", "arrow", "btn", "button", "footer", "header",
 
 def create_driver():
     chrome_options = Options()
-    chrome_options.add_argument("--headless=new")      # 必須無頭模式
-    chrome_options.add_argument("--no-sandbox")        # Linux 必須
-    chrome_options.add_argument("--disable-gpu")       # 雲端沒有顯卡
-    chrome_options.add_argument("--disable-dev-shm-usage") # 記憶體保護，解決 Linux 記憶體不足
-    chrome_options.add_argument("--remote-debugging-port=9222") # 避開常見錯誤
-
-    from selenium.webdriver.chrome.service import Service
-    from webdriver_manager.chrome import ChromeDriverManager
-    
-    #service = Service(ChromeDriverManager().install())
-    
-    # 現在這裡就可以正確使用 service 變數了
-    driver = webdriver.Chrome(service=service, options=chrome_options)
-
-    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--headless=new")
     chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_argument("--remote-debugging-port=9222")
     chrome_options.add_argument("window-size=1920,1080")
     chrome_options.add_argument("--disable-blink-features=AutomationControlled")
-    service = Service(ChromeDriverManager().install())
-    driver = webdriver.Chrome(options=chrome_options)
-    return driver
+    
+    # 指向系統安裝的路徑
+    chrome_options.binary_location = "/usr/bin/chromium"
 
+    try:
+        from selenium.webdriver.chrome.service import Service
+        from webdriver_manager.chrome import ChromeDriverManager
+        
+        # 自動安裝適合的 driver
+        service = Service(ChromeDriverManager().install())
+        
+        # 初始化 driver
+        driver = webdriver.Chrome(service=service, options=chrome_options)
+        return driver
+    except Exception as e:
+        print(f"!!! 瀏覽器啟動失敗: {e}")
+        return None
+    
 def is_valid_event(text, img_url, link):
     combined = (text + img_url + link).lower()
     return any(k.lower() in combined for k in TARGET_KEYWORDS) or \
@@ -57,7 +59,11 @@ def fetch_all_events(target_store_name=None):
     driver = None
 
     try:
+
         driver = create_driver()
+        if driver is None:
+            return [{"error": "瀏覽器啟動失敗，請檢查 Dockerfile 環境"}]
+
         for store in TARGET_STORES:
 
             if target_store_name and store["name"] != target_store_name:
@@ -65,8 +71,11 @@ def fetch_all_events(target_store_name=None):
             try:
                 driver.get(store["url"])
                 # ... (您的爬蟲邏輯)
-            except Exception as e:
-                print(f"爬取 {store['name']} 系統崩潰: {e}")
+        except Exception as e:
+            # 【重要】這裡會抓出真正的錯，並把它存進結果中，讓你可以透過網頁看到詳細訊息
+            error_msg = f"爬蟲崩潰錯誤: {str(e)}"
+            print(error_msg)
+            return [{"error": error_msg}]
 
             # 使用獨立 try-except 處理單一網站錯誤
             try:
@@ -105,7 +114,17 @@ def fetch_all_events(target_store_name=None):
                 continue
 
     finally:
-        driver.quit()
+
+        if driver:
+            driver.quit()
+
+        # 【修正點】：加一個檢查，確認 driver 不是 None 才執行 quit
+        if driver is not None:
+            try:
+                driver.quit()
+            except Exception as e:
+                print(f"關閉瀏覽器時發生錯誤: {e}")
+
     return events_data
 
 @app.route('/')

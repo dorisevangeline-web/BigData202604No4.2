@@ -3,9 +3,6 @@ FROM python:3.11-slim
 
 # 安裝 Chrome 和系統依賴 (這一段是關鍵！)
 RUN apt-get update && apt-get install -y \
-    wget \
-    gnupg \
-    unzip \
     chromium \
     chromium-driver \
     libnss3 \
@@ -14,6 +11,7 @@ RUN apt-get update && apt-get install -y \
     libgbm-dev \
     libasound2 \
     && rm -rf /var/lib/apt/lists/*
+
 
 # 設定工作目錄
 WORKDIR /app
