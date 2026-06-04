@@ -31,9 +31,7 @@ def create_driver():
     chrome_options.add_argument("--remote-debugging-port=9222")
     chrome_options.add_argument("window-size=1920,1080")
     chrome_options.add_argument("--disable-blink-features=AutomationControlled")
-    
-    # 指向系統安裝的路徑
-    chrome_options.binary_location = "/usr/bin/chromium"
+    chrome_options.binary_location = "/usr/bin/chromium"    # 指向系統安裝的路徑
 
     try:
         from selenium.webdriver.chrome.service import Service
@@ -71,10 +69,10 @@ def fetch_all_events(target_store_name=None):
             try:
                 driver.get(store["url"])
                 # ... (您的爬蟲邏輯)
-        except Exception as e:
-            # 【重要】這裡會抓出真正的錯，並把它存進結果中，讓你可以透過網頁看到詳細訊息
-            error_msg = f"爬蟲崩潰錯誤: {str(e)}"
-            print(error_msg)
+            except Exception as e:
+                # 【重要】這裡會抓出真正的錯，並把它存進結果中，讓你可以透過網頁看到詳細訊息
+                error_msg = f"爬蟲崩潰錯誤: {str(e)}"
+                print(error_msg)
             return [{"error": error_msg}]
 
             # 使用獨立 try-except 處理單一網站錯誤
