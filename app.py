@@ -24,16 +24,16 @@ FILTER_KEYWORDS = ["icon", "logo", "arrow", "btn", "button", "footer", "header",
 
 def create_driver():
     chrome_options = Options()
-    chrome_options.add_argument("--headless=new") # 使用新版無頭模式
-    chrome_options.add_argument("--no-sandbox")
-    chrome_options.add_argument("--disable-dev-shm-usage") # 解決 Linux 記憶體不足
-    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--headless=new")      # 必須無頭模式
+    chrome_options.add_argument("--no-sandbox")        # Linux 必須
+    chrome_options.add_argument("--disable-gpu")       # 雲端沒有顯卡
+    chrome_options.add_argument("--disable-dev-shm-usage") # 記憶體保護，解決 Linux 記憶體不足
     chrome_options.add_argument("--remote-debugging-port=9222") # 避開常見錯誤
 
     from selenium.webdriver.chrome.service import Service
     from webdriver_manager.chrome import ChromeDriverManager
     
-    service = Service(ChromeDriverManager().install())
+    #service = Service(ChromeDriverManager().install())
     
     # 現在這裡就可以正確使用 service 變數了
     driver = webdriver.Chrome(service=service, options=chrome_options)
@@ -44,7 +44,7 @@ def create_driver():
     chrome_options.add_argument("window-size=1920,1080")
     chrome_options.add_argument("--disable-blink-features=AutomationControlled")
     service = Service(ChromeDriverManager().install())
-    driver = webdriver.Chrome(service=service, options=chrome_options)
+    driver = webdriver.Chrome(options=chrome_options)
     return driver
 
 def is_valid_event(text, img_url, link):
@@ -112,5 +112,7 @@ def update_events():
 
 # 修改後：
 if __name__ == '__main__':
+    # 這裡直接設定 port 10000 是為了適應 Render 的環境
     port = int(os.environ.get('PORT', 10000))
+    # 確保 debug=False，這在雲端是必須的
     app.run(host='0.0.0.0', port=port, debug=False)
