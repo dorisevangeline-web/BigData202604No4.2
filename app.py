@@ -122,7 +122,8 @@ def fetch_all_events(target_store_name=None):
                 driver.quit()
             except Exception as e:
                 print(f"關閉瀏覽器時發生錯誤: {e}")
-
+                
+    print(f"DEBUG: 總共抓到了 {len(events_data)} 筆資料")   
     return events_data
 
 @app.route('/')
