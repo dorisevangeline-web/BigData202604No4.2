@@ -1,24 +1,22 @@
-# 使用輕量級 Python 映像檔
 FROM python:3.11-slim
 
-# 安裝 Chrome 和相關依賴
+# 安裝系統編譯依賴與 Chrome
 RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
     chromium \
     chromium-driver \
     && rm -rf /var/lib/apt/lists/*
 
-# 設定工作目錄
 WORKDIR /app
 
-# 複製檔案並安裝套件
+# 確保先安裝 pip 的升級版，這能解決很多安裝套件時的雜訊
+RUN pip install --upgrade pip
+
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# 複製所有程式碼
 COPY . .
 
-# 設定環境變數
 ENV PORT=10000
-
-# 啟動命令
 CMD ["gunicorn", "app:app", "--bind", "0.0.0.0:10000"]
