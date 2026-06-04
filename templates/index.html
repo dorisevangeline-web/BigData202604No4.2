@@ -179,34 +179,32 @@
         }
 
         // 負責將資料渲染到畫面上
-        function renderCards() {
-            const container = document.getElementById('events-container');
-            container.innerHTML = '';
+        // 注意這裡，如果您原本是用 filteredData，記得保持一致，或者是用 data
+        data.forEach(event => {
+            const tagClass = getStoreClass(event.store);
+            
+            // 加入預設值處理
+            const title = event.title || "暫無標題";
+            const imgUrl = event.img_url || "https://via.placeholder.com/300x250?text=No+Image";
+            const link = event.link || "#";
+            const storeName = event.store || "未知超商";
 
-            // 根據當前頁籤過濾資料
-            const filteredData = currentTab === '全部' 
-                ? eventsData 
-                : eventsData.filter(event => event.store === currentTab);
+            const cardHTML = `
+                <a href="${link}" target="_blank" class="card">
+                    <img src="${imgUrl}" alt="${title}" onerror="this.src='https://via.placeholder.com/300x250?text=No+Image'">
+                    <div class="card-content">
+                        <span class="store-tag ${tagClass}">${storeName}</span>
+                        <div class="card-title">${title}</div>
+                    </div>
+                </a>
+            `;
+            
+            // 【關鍵】：一定要把這一行補上，卡片才會出現在網頁上
+            container.insertAdjacentHTML('beforeend', cardHTML);
+        });
 
-            if (filteredData.length === 0) {
-                container.innerHTML = `<p style="text-align:center; width:100%; color:#555;">目前 ${currentTab} 沒有掃描到優惠，或尚未抓取資料。</p>`;
-                return;
-            }
 
-            filteredData.forEach(event => {
-                const tagClass = getStoreClass(event.store);
-                const cardHTML = `
-                    <a href="${event.link}" target="_blank" class="card">
-                        <img src="${event.img_url}" alt="優惠圖片" onerror="this.src='https://via.placeholder.com/300x250?text=No+Image'">
-                        <div class="card-content">
-                            <span class="store-tag ${tagClass}">${event.store}</span>
-                            <div class="card-title">${event.title}</div>
-                        </div>
-                    </a>
-                `;
-                container.insertAdjacentHTML('beforeend', cardHTML);
-            });
-        }
+        
 
         // 呼叫 API 抓取資料 (支援單一超商或全部)
         function fetchData(targetStore) {
